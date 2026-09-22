@@ -3,7 +3,11 @@ from __future__ import annotations
 import time
 from typing import Any, Dict, List
 
-from scapy.all import INET, IP, TCP, UDP, ICMP, sniff
+try:
+    from scapy.all import ICMP, IP, TCP, UDP, sniff
+except ImportError:  # pragma: no cover - handled gracefully during runtime
+    ICMP = IP = TCP = UDP = None
+    sniff = None
 
 from src.packet_parser import build_traffic_dataframe, parse_packets
 
@@ -13,6 +17,9 @@ CAPTURE_STARTED_AT: float | None = None
 
 def start_capture(interface: str = "", packet_limit: int = 5000):
     global CAPTURED_PACKETS, CAPTURE_STARTED_AT
+    if sniff is None or IP is None or TCP is None or UDP is None or ICMP is None:
+        raise ImportError("Scapy is not available in the current environment.")
+
     CAPTURED_PACKETS = []
     CAPTURE_STARTED_AT = time.time()
 
