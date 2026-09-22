@@ -41,9 +41,20 @@ def start_capture(interface: str = "", packet_limit: int = 5000):
     except KeyboardInterrupt:
         pass
     except PermissionError:
-        raise PermissionError("Live capture requires appropriate permissions.")
+        raise PermissionError(
+            "Live capture was blocked by Windows. Install Npcap with WinPcap API-compatible mode enabled, "
+            "then restart the application."
+        )
     except OSError as exc:
         raise OSError(f"Unable to access the selected network interface: {exc}")
+    except RuntimeError as exc:
+        message = str(exc)
+        if "winpcap is not installed" in message.lower():
+            raise RuntimeError(
+                "Windows packet capture is unavailable because Npcap is not installed. "
+                "Install Npcap with WinPcap API-compatible mode enabled, then restart the application."
+            ) from exc
+        raise RuntimeError(f"Scapy could not start live capture: {message}") from exc
 
     return CAPTURED_PACKETS
 

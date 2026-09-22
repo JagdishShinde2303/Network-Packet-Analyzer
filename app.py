@@ -261,8 +261,10 @@ def _show_live_analyzer():
             st.error(str(exc))
         except OSError as exc:
             st.error(str(exc))
+        except RuntimeError as exc:
+            st.error(str(exc))
         except Exception:
-            st.error("Live capture requires appropriate permissions or a compatible network interface.")
+            st.error("Live capture failed. Check the selected interface and confirm that Npcap is installed.")
 
     if st.button("STOP & ANALYZE"):
         packets = stop_capture()
